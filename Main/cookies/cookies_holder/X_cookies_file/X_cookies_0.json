@@ -1,0 +1,152 @@
+[
+    {
+        "name": "guest_id",
+        "value": "v1%3A173531835463701953",
+        "domain": ".twitter.com",
+        "path": "/",
+        "expires": 1769532755.812904,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "guest_id",
+        "value": "173531835463701953",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1766854356.005634,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "night_mode",
+        "value": "2",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1766854362.449268,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "gt",
+        "value": "1872687028149665981",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1735327356.276519,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "kdt",
+        "value": "AeE0ARytSk8gdShcMaVQGBPYGJr3QYeQZPJ46ICo",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1769532761.331854,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "auth_token",
+        "value": "3c18bccbc976b141aadab0c651ca0e1828bb330c",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1769532761.331986,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "ct0",
+        "value": "fae480952325e1b3b8d85df333f0c1b86cdf0a23e90c4111445b227b16cb1c140050781cc4d27c4cfe0adf2ac634caf13a453a969facf1ade05ae86057d24f807dff67373b5d7aab8fe6a35d1b887a7d",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1769532761.549694,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "att",
+        "value": "1-ptLvV5jhdgYceCNbXbydox2ooCIMA33fEEFhV69v",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1735404761.805685,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "lang",
+        "value": "en",
+        "domain": "x.com",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "twid",
+        "value": "u%3D1866412973557755904",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1766854362.964601,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "guest_id_marketing",
+        "value": "v1%3A173531835463701953",
+        "domain": ".twitter.com",
+        "path": "/",
+        "expires": 1769878362.665717,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "guest_id_ads",
+        "value": "v1%3A173531835463701953",
+        "domain": ".twitter.com",
+        "path": "/",
+        "expires": 1769878362.6658,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "personalization_id",
+        "value": "\"v1_Tf2S6oY1ylOew9FZ5UPuSw==\"",
+        "domain": ".twitter.com",
+        "path": "/",
+        "expires": 1769878362.665822,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "twid",
+        "value": "u%3D1866412973557755904",
+        "domain": ".twitter.com",
+        "path": "/",
+        "expires": 1769878362.665841,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "d_prefs",
+        "value": "MToxLGNvbnNlbnRfdmVyc2lvbjoyLHRleHRfdmVyc2lvbjoxMDAw",
+        "domain": ".x.com",
+        "path": "/",
+        "expires": 1750870363.270783,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Lax"
+    }
+]
