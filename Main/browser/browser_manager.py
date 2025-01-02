@@ -2,14 +2,18 @@ import asyncio
 import threading
 
 from playwright.async_api import async_playwright, Page
-from Main.headers_generator import HeadersGenerator
+from fake_headers import Headers
+
+
+
 
 
 class BrowserManager:
-    def __init__(self, headless=False, cookies=None):
+    def __init__(self,cookies, headless=False):
         self.headless = headless
-        self.cookies = cookies
-        self.headers = HeadersGenerator()
+        self.cookies_manager = cookies
+        self.cookies = asyncio.run(cookies.get_cookies_for_browser())
+        self.headers = Headers(browser="chrome").generate()
 
         self._browser_context = None
         self.page: Page = None
@@ -36,7 +40,7 @@ class BrowserManager:
         playwright = await async_playwright().start()
         browser = await playwright.chromium.launch(headless=self.headless)
         self._browser_context = await browser.new_context(locale="en-US")
-        user_agent = await self.headers.generate_allowed_agent()
+        user_agent = self.headers["User-Agent"]
         await self._browser_context.set_extra_http_headers({"User-Agent": user_agent})
         if self.cookies:
             await self._browser_context.add_cookies(self.cookies)

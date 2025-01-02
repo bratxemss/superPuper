@@ -4,10 +4,10 @@ import json
 import re
 
 from pathlib import Path
-from Main.headers_generator import HeadersGenerator
+from fake_headers import Headers
 
 
-from Main.cookies.cookies import Cookies
+from Main.cookies.cookies_manager import Cookies
 
 
 PATH = Path(__file__).parent.parent.parent
@@ -30,16 +30,17 @@ async def filter_tweet(text):
 
 
 class TweetRequest:
-    def __init__(self, user_id: int):
+    def __init__(self, user_id: int, cookies):
         self.user_id = user_id
         self.url = "https://x.com/i/api/graphql/TK4W-Bktk8AJk0L1QZnkrg/UserTweets"
-        self.cookies_manager = Cookies(PATH/"cookies"/"cookies_holder"/"X_cookies_file"/"X_cookies_0.json")
-        self.headers_generator = HeadersGenerator()
+        self.cookies_manager = Cookies()
+        self.cookies = cookies
+        self.headers_generator = Headers(browser="chrome").generate()
         self.bearer_token = None
         self.headers = None
 
         self.variables = {
-            "userId": str(self.user_id),  # Идентификатор пользователя
+            "userId": str(self.user_id),  
             "count": 20,
             "cursor": None,
             "includePromotedContent": True,
@@ -84,9 +85,9 @@ class TweetRequest:
         self.bearer_token = await get_bearer_token()
         self.headers = {
             "Authorization": f"Bearer {self.bearer_token}",
-            "User-Agent": await self.headers_generator.generate_allowed_agent(),
-            "x-csrf-token": self.cookies_manager.get_value_from_cookie("ct0"),
-            "cookie": self.cookies_manager.cookies_to_string(),
+            "User-Agent": self.headers_generator["User-Agent"],
+            "x-csrf-token": await self.cookies_manager.get_cookie_value(self.cookies,"ct0"),
+            "cookie": await self.cookies_manager.cookies_to_string(self.cookies),
             "Referer": "https://x.com/",
             "Origin": "https://x.com",
         }
