@@ -50,7 +50,7 @@ class X_Scraper:
             print(self.browser_manager.page)
             cookies = self.browser_manager.run_async(self.browser_manager.page.context.cookies())
             print("Полученные cookies:", cookies)  # Отладочный вывод cookies
-            await self.cookies_manager.create_cookie_file("X", cookies)
+            self.cookies_manager.create_cookie_file("X", cookies)
             # для запуска любой асинхроной функции в browser_manager
 
     async def find_user_id_and_description(self):
@@ -70,7 +70,7 @@ class X_Scraper:
             return None, None
 
     async def get_cookies_and_authorize(self):
-        if not await self.cookies_manager.check_for_x():
+        if not self.cookies_manager.check_for_x():
             self.browser_manager.navigate_to_url(self.login_page)
             await self.log_in()
 
@@ -79,10 +79,11 @@ class X_Scraper:
         profile_url = f"https://x.com/{self.name}"
         self.browser_manager.navigate_to_url(profile_url)
         user_id, description = await self.find_user_id_and_description()
+        print(user_id)
         if user_id:
             print(f"{self.name} scraping started")
             print(self.browser_manager.cookies)
-            tweets_request = TweetRequest(user_id, cookies=self.browser_manager.cookies)
+            tweets_request = TweetRequest(user_id)
             tweets = await tweets_request.get_all_tweets()
 
             gpt_response = await self.gpt.send_gpt_request(self.name, tweets, description)

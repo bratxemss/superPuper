@@ -4,8 +4,7 @@ import json
 import re
 
 from pathlib import Path
-from fake_headers import Headers
-
+from Main.proxy.request_with_proxy import RequestWithProxy
 
 from Main.cookies.cookies_manager import Cookies
 
@@ -20,7 +19,7 @@ async def get_bearer_token():
             return re.search(r"s=\"([\w%]{104})\"", text)[1]
 
 
-async def filter_tweet(text):
+def filter_tweet(text):
     text = text.replace("\n", " ")
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'http\S+|www\.\S+', '', text)
@@ -30,18 +29,16 @@ async def filter_tweet(text):
 
 
 class TweetRequest:
-    def __init__(self, user_id: int, cookies):
+    def __init__(self, user_id: int):
         self.user_id = user_id
         self.url = "https://x.com/i/api/graphql/TK4W-Bktk8AJk0L1QZnkrg/UserTweets"
         self.cookies_manager = Cookies()
-        self.cookies = cookies
-        self.headers_generator = Headers(browser="chrome").generate()
+        self.cookies = ""
         self.bearer_token = None
-        self.headers = None
 
         self.variables = {
-            "userId": str(self.user_id),  
-            "count": 20,
+            "userId": str(self.user_id),
+            "count": 25,
             "cursor": None,
             "includePromotedContent": True,
             "withQuickPromoteEligibilityTweetFields": True,
@@ -85,12 +82,12 @@ class TweetRequest:
         self.bearer_token = await get_bearer_token()
         self.headers = {
             "Authorization": f"Bearer {self.bearer_token}",
-            "User-Agent": self.headers_generator["User-Agent"],
-            "x-csrf-token": await self.cookies_manager.get_cookie_value(self.cookies,"ct0"),
-            "cookie": await self.cookies_manager.cookies_to_string(self.cookies),
+            "x-csrf-token": self.cookies_manager.get_cookie_value(self.cookies_manager.get_cookies_for_browser(),"ct0"),
+            "cookie": self.cookies_manager.cookies_to_string(self.cookies_manager.get_cookies_for_browser()),
             "Referer": "https://x.com/",
             "Origin": "https://x.com",
         }
+        return True
 
     def extract_data(self, tweet_data):
         texts = []
@@ -108,76 +105,66 @@ class TweetRequest:
     async def get_all_tweets(self):
         all_tweets = set()
         current_cursor = None
-        max_iterations = 100
+        max_iterations = 15
         iteration = 0
-        repeat_count = 0  # Счетчик повторений
-        previous_count = 0  # Предыдущее количество твитов
+        repeat_count = 0
+        previous_count = 0
         amount_of_requests = 0
-        await self.initialize()
 
-        async with aiohttp.ClientSession() as session:
+        if await self.initialize():
             while iteration < max_iterations:
                 self.variables["cursor"] = current_cursor
                 self.params["variables"] = json.dumps(self.variables)
+                response = await RequestWithProxy(url=self.url, headers=self.headers,
+                                                  params=self.params).fetch_json()
 
-                try:
-                    async with session.get(self.url, headers=self.headers, params=self.params) as response:
-                        if response.status == 200:
-                            response_json = await response.json()
-                            amount_of_requests += 1
-                            print(f"Request {amount_of_requests} completed")
-                            tweets = self.extract_data(response_json)
-                            for tweet in tweets:
-                                all_tweets.add(await filter_tweet(tweet))
+                amount_of_requests += 1
+                print(f"Request {amount_of_requests} completed")
 
-                            current_count = len(all_tweets)
-                            if current_count == previous_count:
-                                repeat_count += 1
-                            else:
-                                repeat_count = 0
-                            previous_count = current_count
+                tweets = self.extract_data(response)
+                for tweet in tweets:
+                    all_tweets.add(filter_tweet(tweet))
 
-                            # if current_count >= 100:
-                            #     return all_tweets
+                current_count = len(all_tweets)
 
-                            if repeat_count >= 2:
-                                break
+                if current_count == previous_count:
+                    repeat_count += 1
+                else:
+                    repeat_count = 0
+                previous_count = current_count
 
-                            instructions = (
-                                response_json.get("data", {})
-                                .get("user", {})
-                                .get("result", {})
-                                .get("timeline_v2", {})
-                                .get("timeline", {})
-                                .get("instructions", [])
-                            )
-
-                            current_cursor = None
-                            for instruction in instructions:
-                                if isinstance(instruction, dict) and "entries" in instruction:
-                                    for entry in instruction["entries"]:
-                                        if entry.get("entryId", "").startswith("cursor-bottom-"):
-                                            current_cursor = entry.get("content", {}).get("value")
-                                            break
-                                if current_cursor:
-                                    break
-                            if not current_cursor:
-                                break
-
-                            # Задержка между запросами
-                            await asyncio.sleep(1)
-                            iteration += 1
-
-                        elif response.status == 400:
-                            break
-
-                        elif response.status == 429:
-                            break
-
-                except aiohttp.ClientError as e:
+                if current_count >= 150 or repeat_count >= 1:
                     break
-        print("FINISH")
-        return all_tweets
 
+                instructions = (
+                    response.get("data", {})
+                    .get("user", {})
+                    .get("result", {})
+                    .get("timeline_v2", {})
+                    .get("timeline", {})
+                    .get("instructions", [])
+                )
+
+                current_cursor = None
+                for instruction in instructions:
+                    if isinstance(instruction, dict) and "entries" in instruction:
+                        for entry in instruction["entries"]:
+                            if entry.get("entryId", "").startswith("cursor-bottom-"):
+                                current_cursor = entry.get("content", {}).get("value")
+                                break
+                    if current_cursor:
+                        break
+                if not current_cursor:
+                    break
+
+                await asyncio.sleep(0.5)
+                iteration += 1
+                print(len(all_tweets))
+            return all_tweets
+
+
+if __name__ == "__main__":
+    test = TweetRequest(36030921)
+    print(asyncio.run(test.get_all_tweets()))
 
 
